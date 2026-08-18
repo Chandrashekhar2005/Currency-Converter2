@@ -1,0 +1,359 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Coins,
+  ArrowLeftRight,
+  TrendingUp,
+  Globe,
+  Calculator,
+  Table,
+  Sparkles,
+  RefreshCw,
+  Search,
+  CheckCircle2,
+} from 'lucide-react';
+import { Currency, ExchangeRatesData, ConversionRecord } from './types/currency';
+import { UNIQUE_CURRENCIES } from './data/currencies';
+import { fetchLiveRates, calculateRate } from './services/exchangeRates';
+import { Header } from './components/Header';
+import { ConverterCard } from './components/ConverterCard';
+import { MultiCurrencyComparison } from './components/MultiCurrencyComparison';
+import { ExchangeRateTrend } from './components/ExchangeRateTrend';
+import { TravelFeeCalculator } from './components/TravelFeeCalculator';
+import { DenominationCheatSheet } from './components/DenominationCheatSheet';
+import { CurrencySelectorModal } from './components/CurrencySelectorModal';
+import { ConversionHistoryDrawer } from './components/ConversionHistoryDrawer';
+import { Toast } from './components/Toast';
+
+const POPULAR_PAIRS = [
+  { from: 'USD', to: 'EUR' },
+  { from: 'USD', to: 'GBP' },
+  { from: 'USD', to: 'JPY' },
+  { from: 'USD', to: 'INR' },
+  { from: 'EUR', to: 'GBP' },
+  { from: 'USD', to: 'CAD' },
+  { from: 'USD', to: 'AUD' },
+  { from: 'USD', to: 'AED' },
+  { from: 'USD', to: 'CNY' },
+  { from: 'USD', to: 'BRL' },
+];
+
+export default function App() {
+  const [fromCurrency, setFromCurrency] = useState<Currency>(() => {
+    return UNIQUE_CURRENCIES.find((c) => c.code === 'USD') || UNIQUE_CURRENCIES[0];
+  });
+
+  const [toCurrency, setToCurrency] = useState<Currency>(() => {
+    return UNIQUE_CURRENCIES.find((c) => c.code === 'EUR') || UNIQUE_CURRENCIES[1];
+  });
+
+  const [baseAmount, setBaseAmount] = useState<number>(100);
+  const [ratesData, setRatesData] = useState<ExchangeRatesData | null>(null);
+  const [isLoadingRates, setIsLoadingRates] = useState<boolean>(true);
+
+  // Modals state
+  const [isFromModalOpen, setIsFromModalOpen] = useState(false);
+  const [isToModalOpen, setIsToModalOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Active sub-view tab
+  const [activeTab, setActiveTab] = useState<'calculator' | 'watchlist' | 'trends' | 'fees' | 'matrix'>('calculator');
+
+  // History & Toast
+  const [history, setHistory] = useState<ConversionRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem('fx_conversion_history');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage((current) => (current === msg ? null : current));
+    }, 3500);
+  }, []);
+
+  // Fetch exchange rates
+  const loadRates = useCallback(async (base: string = 'USD') => {
+    setIsLoadingRates(true);
+    try {
+      const data = await fetchLiveRates(base);
+      setRatesData(data);
+    } catch (e) {
+      console.error('Failed to load rates', e);
+    } finally {
+      setIsLoadingRates(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRates(fromCurrency.code);
+  }, [fromCurrency.code, loadRates]);
+
+  const handleSwap = () => {
+    const prevFrom = fromCurrency;
+    const prevTo = toCurrency;
+    setFromCurrency(prevTo);
+    setToCurrency(prevFrom);
+    showToast(`Swapped ${prevTo.code} ⇄ ${prevFrom.code}`);
+  };
+
+  const handleAddToHistory = (
+    from: Currency,
+    to: Currency,
+    fromAmt: number,
+    toAmt: number,
+    rate: number
+  ) => {
+    const record: ConversionRecord = {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      fromCode: from.code,
+      toCode: to.code,
+      fromAmount: fromAmt,
+      toAmount: toAmt,
+      rate,
+      timestamp: Date.now(),
+    };
+
+    setHistory((prev) => {
+      // Don't add identical duplicate consecutive records
+      if (
+        prev[0] &&
+        prev[0].fromCode === record.fromCode &&
+        prev[0].toCode === record.toCode &&
+        Math.abs(prev[0].fromAmount - record.fromAmount) < 0.01
+      ) {
+        return prev;
+      }
+      const updated = [record, ...prev.slice(0, 19)];
+      try {
+        localStorage.setItem('fx_conversion_history', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    try {
+      localStorage.removeItem('fx_conversion_history');
+    } catch {}
+    showToast('Conversion history cleared');
+  };
+
+  const handleApplyHistory = (record: ConversionRecord) => {
+    const foundFrom = UNIQUE_CURRENCIES.find((c) => c.code === record.fromCode);
+    const foundTo = UNIQUE_CURRENCIES.find((c) => c.code === record.toCode);
+    if (foundFrom && foundTo) {
+      setFromCurrency(foundFrom);
+      setToCurrency(foundTo);
+      setBaseAmount(record.fromAmount);
+      showToast(`Loaded ${record.fromCode} to ${record.toCode} conversion`);
+    }
+  };
+
+  const currentRate = calculateRate(fromCurrency.code, toCurrency.code, ratesData);
+
+  return (
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+      {/* Header */}
+      <Header
+        ratesData={ratesData}
+        isLoading={isLoadingRates}
+        onRefresh={() => loadRates(fromCurrency.code)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        historyCount={history.length}
+      />
+
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+        {/* Popular Pairs Strip */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+          <span className="text-slate-600 font-bold shrink-0">Popular Pairs:</span>
+          {POPULAR_PAIRS.map((pair) => {
+            const isActive = fromCurrency.code === pair.from && toCurrency.code === pair.to;
+            return (
+              <button
+                key={`${pair.from}-${pair.to}`}
+                onClick={() => {
+                  const f = UNIQUE_CURRENCIES.find((c) => c.code === pair.from);
+                  const t = UNIQUE_CURRENCIES.find((c) => c.code === pair.to);
+                  if (f && t) {
+                    setFromCurrency(f);
+                    setToCurrency(t);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-xl border shrink-0 transition-all ${
+                  isActive
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                }`}
+              >
+                {pair.from} / {pair.to}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Primary Converter Card (Always Visible on Top) */}
+        <ConverterCard
+          fromCurrency={fromCurrency}
+          toCurrency={toCurrency}
+          onOpenFromModal={() => setIsFromModalOpen(true)}
+          onOpenToModal={() => setIsToModalOpen(true)}
+          onSwapCurrencies={handleSwap}
+          ratesData={ratesData}
+          isLoading={isLoadingRates}
+          onRefresh={() => loadRates(fromCurrency.code)}
+          onShowToast={showToast}
+          onAddToHistory={handleAddToHistory}
+        />
+
+        {/* Feature Navigation Tabs */}
+        <div className="flex items-center gap-1.5 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-x-auto">
+          <button
+            id="tab-watchlist"
+            onClick={() => setActiveTab('watchlist')}
+            className={`flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'watchlist'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Globe className="w-4 h-4 text-emerald-400" />
+            <span>Multi-Currency Board</span>
+          </button>
+
+          <button
+            id="tab-trends"
+            onClick={() => setActiveTab('trends')}
+            className={`flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'trends'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <span>Rate Trends (Chart)</span>
+          </button>
+
+          <button
+            id="tab-fees"
+            onClick={() => setActiveTab('fees')}
+            className={`flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'fees'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Calculator className="w-4 h-4 text-emerald-400" />
+            <span>Fee & Markup Analyzer</span>
+          </button>
+
+          <button
+            id="tab-matrix"
+            onClick={() => setActiveTab('matrix')}
+            className={`flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'matrix'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Table className="w-4 h-4 text-emerald-400" />
+            <span>Cheat Sheet Matrix</span>
+          </button>
+        </div>
+
+        {/* Active Tab View Panels */}
+        <div className="transition-all">
+          {activeTab === 'watchlist' && (
+            <MultiCurrencyComparison
+              baseCurrency={fromCurrency}
+              baseAmount={baseAmount}
+              ratesData={ratesData}
+              onSelectAsTarget={(target) => {
+                setToCurrency(target);
+                showToast(`Set ${target.code} (${target.countryName}) as target`);
+              }}
+            />
+          )}
+
+          {activeTab === 'trends' && (
+            <ExchangeRateTrend
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              currentRate={currentRate}
+            />
+          )}
+
+          {activeTab === 'fees' && (
+            <TravelFeeCalculator
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              baseAmount={baseAmount}
+              currentRate={currentRate}
+            />
+          )}
+
+          {activeTab === 'matrix' && (
+            <DenominationCheatSheet
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              currentRate={currentRate}
+            />
+          )}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white/70 py-6 text-center text-xs text-slate-500 mt-auto">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>
+            Supports 170+ sovereign currencies, national flags & real-time global FX rates.
+          </p>
+          <p className="font-mono text-[11px] text-slate-400">
+            Real-time interbank reference feeds
+          </p>
+        </div>
+      </footer>
+
+      {/* Currency Picker Modal for FROM */}
+      <CurrencySelectorModal
+        isOpen={isFromModalOpen}
+        onClose={() => setIsFromModalOpen(false)}
+        selectedCode={fromCurrency.code}
+        onSelect={(selected) => {
+          setFromCurrency(selected);
+          showToast(`Selected ${selected.code} (${selected.countryName}) as base`);
+        }}
+        title="Select Base Currency (From)"
+      />
+
+      {/* Currency Picker Modal for TO */}
+      <CurrencySelectorModal
+        isOpen={isToModalOpen}
+        onClose={() => setIsToModalOpen(false)}
+        selectedCode={toCurrency.code}
+        onSelect={(selected) => {
+          setToCurrency(selected);
+          showToast(`Selected ${selected.code} (${selected.countryName}) as target`);
+        }}
+        title="Select Target Currency (To)"
+      />
+
+      {/* Conversion History Drawer */}
+      <ConversionHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={history}
+        onClearHistory={handleClearHistory}
+        onApplyHistory={handleApplyHistory}
+      />
+
+      {/* Toast Notification */}
+      <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+    </div>
+  );
+}

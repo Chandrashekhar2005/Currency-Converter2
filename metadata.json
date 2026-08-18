@@ -1,0 +1,6 @@
+{
+  "name": "Currency Converter",
+  "description": "Live global currency converter supporting 170+ world currencies with real-time exchange rates, country flags, comparison tables, historical trends, and fee calculator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
