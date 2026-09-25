@@ -170,32 +170,6 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Popular Pairs Strip */}
-        <section>
-          <h2>Free Live Currency Converter</h2>
-        
-          <p>
-            Convert currencies quickly and easily with our free live currency converter.
-            Choose your base currency, select the currency you want to convert to, and
-            enter the amount to get the latest available exchange rate.
-          </p>
-        
-          <h2>Convert 170+ Currencies</h2>
-        
-          <p>
-            Our currency converter supports more than 170 currencies from around the
-            world. You can convert major currencies such as USD, EUR, GBP, INR, JPY,
-            AUD, CAD and many more.
-          </p>
-        
-          <h2>How to Use the Currency Converter</h2>
-        
-          <ol>
-            <li>Select the currency you want to convert from.</li>
-            <li>Select the currency you want to convert to.</li>
-            <li>Enter the amount.</li>
-            <li>Click the convert button to see the result.</li>
-          </ol>
-        </section>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
           <span className="text-slate-600 font-bold shrink-0">Popular Pairs:</span>
           {POPULAR_PAIRS.map((pair) => {
@@ -236,6 +210,37 @@ export default function App() {
           onShowToast={showToast}
           onAddToHistory={handleAddToHistory}
         />
+        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">
+            Live Currency Converter
+          </h1>
+        
+          <p className="text-slate-600 leading-7 mb-5">
+            Convert currencies quickly and easily with our free live currency
+            converter. Choose your base currency, select the currency you want to
+            convert to, and enter the amount to get the latest available exchange rate.
+          </p>
+        
+          <h2 className="text-xl font-bold text-slate-900 mb-2">
+            Convert 170+ Currencies
+          </h2>
+        
+          <p className="text-slate-600 leading-7 mb-5">
+            Our currency converter supports more than 170 currencies from around the
+            world, including USD, EUR, GBP, INR, JPY, AUD, CAD and many more.
+          </p>
+        
+          <h2 className="text-xl font-bold text-slate-900 mb-2">
+            How to Use the Currency Converter
+          </h2>
+        
+          <ol className="list-decimal list-inside text-slate-600 space-y-1">
+            <li>Select the currency you want to convert from.</li>
+            <li>Select the currency you want to convert to.</li>
+            <li>Enter the amount.</li>
+            <li>Click the convert button to see the result.</li>
+          </ol>
+        </section>
 
         {/* Feature Navigation Tabs */}
         <div className="flex items-center gap-1.5 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-x-auto">
