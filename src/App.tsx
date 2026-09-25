@@ -404,6 +404,65 @@ export default function App() {
           </ol>
         </section>
 
+        {/* FAQ Section */}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-slate-900 mb-5">
+              Frequently Asked Questions
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-bold text-slate-900">
+                  What is a currency converter?
+                </h3>
+                <p className="text-slate-600 leading-7 mt-1">
+                  A currency converter helps you calculate the value of one
+                  currency in another currency using an exchange rate.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900">
+                  How many currencies does Global FX support?
+                </h3>
+                <p className="text-slate-600 leading-7 mt-1">
+                  Global FX supports more than 170 currencies from countries
+                  and regions around the world.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900">
+                  Can I convert USD to INR?
+                </h3>
+                <p className="text-slate-600 leading-7 mt-1">
+                  Yes. Select USD as the base currency and INR as the target
+                  currency to calculate the conversion.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900">
+                  Can I convert EUR to USD?
+                </h3>
+                <p className="text-slate-600 leading-7 mt-1">
+                  Yes. Select EUR as the base currency and USD as the target
+                  currency to calculate the conversion.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900">
+                  Is Global FX free to use?
+                </h3>
+                <p className="text-slate-600 leading-7 mt-1">
+                  Yes. The Global FX currency converter is available to use
+                  without a conversion fee from the website.
+                </p>
+              </div>
+            </div>
+          </div>
+
         {/* Popular Currency Conversions */}
         <section
           className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs"
