@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none">
-                Global FX
+                 Live Currency Converter
               </h1>
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                 170+ Currencies
