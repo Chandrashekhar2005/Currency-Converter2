@@ -211,9 +211,9 @@ export default function App() {
           onAddToHistory={handleAddToHistory}
         />
         <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">
             Live Currency Converter
-          </h1>
+          </h2>
         
           <p className="text-slate-600 leading-7 mb-5">
             Convert currencies quickly and easily with our free live currency
