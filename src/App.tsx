@@ -336,6 +336,88 @@ export default function App() {
             />
           )}
         </div>
+        {/* SEO - Popular Currency Conversions */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+            Popular Currency Conversions
+          </h2>
+
+          <p className="text-slate-600 leading-7 mb-6">
+            Convert popular currencies quickly with Global FX. Select your
+            currencies and enter an amount to calculate the latest available
+            exchange rate.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                USD to INR Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert US Dollars to Indian Rupees.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                USD to EUR Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert US Dollars to Euros.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                USD to GBP Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert US Dollars to British Pounds.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                USD to JPY Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert US Dollars to Japanese Yen.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                EUR to GBP Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert Euros to British Pounds.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h3 className="font-bold text-slate-900">
+                USD to AED Converter
+              </h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Convert US Dollars to UAE Dirhams.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">
+              Currency Converter for International Travel
+            </h2>
+
+            <p className="text-slate-600 leading-7">
+              Use the Global FX currency converter to check exchange rates
+              before travelling, shopping internationally, sending money
+              abroad, or comparing prices in different currencies. The
+              converter supports 170+ currencies and provides a simple way
+              to calculate currency values.
+            </p>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
